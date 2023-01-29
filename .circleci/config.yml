@@ -72,6 +72,10 @@ jobs:
           command: |
             cd backend
             npm run test
+      - slack/notify:
+          channel: C04CPS646NP
+          event: always
+          template: 
 
 
   scan-frontend:
@@ -100,11 +104,7 @@ jobs:
           command: |
             cd backend
             npm install 
-            npm audit fix --audit-level=critical
-      - slack/notify:
-          channel: C04CPS646NP
-          event: always
-          template: 
+            npm audit fix --force
 
 workflows:
   koyaworkflow:
