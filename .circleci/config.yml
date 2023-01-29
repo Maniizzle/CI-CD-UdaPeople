@@ -1,7 +1,19 @@
 version: 2.1
 
-            
+orbs:
+  slack: circleci/slack@4.12.1
+  node: circleci/node:4.1
+
 jobs:
+  build:
+    machine: true
+    steps:
+      - run: some build command
+      - slack/notify:
+          branch_pattern: master
+          event: always
+          template: 
+
   build-frontend:
     docker:
       - image: circleci/node:13.8.0
@@ -89,7 +101,11 @@ jobs:
           command: |
             cd backend
             npm install 
-            npm audit fix --force
+            npm audit fix --audit-level=critical
+      - slack/notify:
+          channel: C04CPS646NP
+          event: always
+          template: 
 
 workflows:
   koyaworkflow:
@@ -104,3 +120,4 @@ workflows:
           requires: [build-frontend]
       - scan-backend:
           requires: [build-backend]
+          context: SlackContext
