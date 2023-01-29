@@ -115,8 +115,8 @@ workflows:
           requires: [build-frontend]
       - test-backend:
           requires: [build-backend]
+          context: SlackContext
       - scan-frontend:
           requires: [build-frontend]
       - scan-backend:
           requires: [build-backend]
-          context: SlackContext
