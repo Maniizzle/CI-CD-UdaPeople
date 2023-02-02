@@ -16,6 +16,9 @@ commands:
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
     parameters:
+      workflow_id:
+        default: "${CIRCLE_WORKFLOW_ID:0:7}"
+        type: string
       # Add parameter here     
     steps:
       - run:
@@ -23,13 +26,12 @@ commands:
           # Add when this will run
           command: |
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS = 1
+            SUCCESS = $(curl --insecure "https://kvdb.io/BdPqYR9u1wQ3QWYF6Ru9SN/migration_<<parameters.workflow_id>>"")
             if(( $SUCCESS==1 )); 
             then
-            #  cd ~/project/backend
-            #  npm install
-            #  Add revert code here. You can find this in the Getting Started section.
-              exit 1
+             cd ~/project/backend
+             npm install
+             npm run migrations:revert
             fi
             
 jobs:
@@ -142,6 +144,7 @@ jobs:
           name: Install dependencies
           command: |
             # Your code here
+            apk add --update ---no-cache tar gzip ansible aws cli
             exit 1
       - run:
           name: Configure server
