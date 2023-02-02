@@ -205,7 +205,7 @@ jobs:
       - run:
           name: Install Ansible
           command: |
-            apk add --update ansible tar gzip
+            apk add --update ansible tar gzip aws-cli
       - run:
           name: Run Playbook and Configure server
           command: |
