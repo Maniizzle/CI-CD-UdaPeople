@@ -40,4 +40,5 @@ environment:
     # Add more env vars here
 
   roles:
+    - configure-server
     # Your code here
