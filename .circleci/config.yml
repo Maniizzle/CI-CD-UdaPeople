@@ -366,6 +366,11 @@ jobs:
       - run:
           name: Backend smoke test.
           command: |
+            export BACKEND_IP=$(aws ec2 describe-instances \
+            --query "Reservations[*].Instances[*].PublicIpAddress" \
+            --filters "Name=tag:project,Values=udapeoplebe" \
+            --output text)   # your code here
+            echo BACKEND_IP
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
             if curl "${API_URL}/api/status" | grep "ok"
@@ -388,6 +393,10 @@ jobs:
               return 1
             fi
 
+      - destroy-environment:
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
+      - revert-migrations:
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
             # your code here
       # Here's where you will add some code to rollback on failure  
       # Here's where you will add some code to rollback on failure  
