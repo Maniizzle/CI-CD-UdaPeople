@@ -35,7 +35,7 @@ commands:
           # Add when this will run
           command: |
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS = $(curl --insecure "https://kvdb.io/BdPqYR9u1wQ3QWYF6Ru9SN/migration_<<parameters.workflow_id>>"")
+            SUCCESS = $(curl --insecure "https://kvdb.io/BdPqYR9u1wQ3QWYF6Ru9SN/migration_<<parameters.workflow_id>>")
             if(( $SUCCESS==1 )); 
             then
              cd ~/project/backend
@@ -253,7 +253,7 @@ jobs:
      # Here's where you will add some code to rollback on failure      
   deploy-frontend:
     docker:
-      - image: amazon/aws-cli
+      - image: python:3.10-alpine3.16
     steps:
       - checkout
       - attach_workspace:
