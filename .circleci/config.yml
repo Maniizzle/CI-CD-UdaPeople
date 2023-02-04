@@ -222,10 +222,16 @@ jobs:
     steps:
       - checkout # Checkout code from git
       - run:
-          name: Run migrations
+          name: install dependencies
           command: |
             sudo apt-get update && sudo apt-get install -yy less
-            apk add --update ansible python3 tar gzip aws-cli
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+
+      - run:
+          name: Run migrations
+          command: |
             cd backend
             npm install
             # Run and save the migration output
