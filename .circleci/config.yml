@@ -31,6 +31,7 @@ commands:
     steps:
       - run:
           name: Revert migrations
+          when: on_fail
           # Add when this will run
           command: |
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
@@ -219,10 +220,11 @@ jobs:
       - image: circleci/node:13.8.0
       # Docker image here that supports NodeJS
     steps:
-      # Checkout code from git
+      - checkout # Checkout code from git
       - run:
           name: Run migrations
           command: |
+            apk add --update ansible python3 tar gzip aws-cli
             cd backend
             npm install
             # Run and save the migration output
@@ -238,8 +240,6 @@ jobs:
   
       - destroy-environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
-      - revert-migrations:
-          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
 
      # Here's where you will add some code to rollback on failure      
   deploy-frontend:
@@ -252,6 +252,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
+            apk add --update ansible tar gzip aws-cli
             # your code here
       - run:
           name: Get backend url
@@ -264,8 +265,7 @@ jobs:
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
             echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
-            cat frontend/.envexport API_URL="http://${BACKEND_IP}:3030"
-            echo "${API_URL}"
+            cat frontend/.env
       - run:
           name: Deploy frontend objects
           command: |
@@ -275,6 +275,8 @@ jobs:
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
       - destroy-environment:
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
+      - revert-migrations:
           workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
       # Here's where you will add some code to rollback on failure      
                     
@@ -286,13 +288,36 @@ jobs:
       # Checkout code from git
       # Add ssh keys with fingerprint
       # attach workspace
+      - checkout
+      - add_ssh_keys:
+              fingerprints: ["63:d7:fa:bb:d1:98:78:e4:63:60:be:60:76:8c:51:98"] 
+      - attach_workspace:
+          at: ~/
       - run:
           name: Install dependencies
           command: |
+            apk add --update ansible tar gzip npm
             # your code here
       - run:
           name: Deploy backend
           command: |
+            cd backend
+            npm i
+            npm run build
+            cd ..
+            # Zip the directory
+            tar -C backend -czvf artifact.tar.gz .
+            mv artifact.tar.gz .circleci/ansible/roles/deploy/files
+            cd .circleci/ansible
+            echo "Contents  of the inventory.txt file is -------"
+            cat inventory.txt
+            ansible-playbook -i inventory.txt deploy-backend.yml
+
+      - destroy-environment:
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
+      - revert-migrations:
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
+
             # your code here
       # Here's where you will add some code to rollback on failure  
 
@@ -318,3 +343,8 @@ workflows:
           requires: [deploy-infrastructure]
       - run-migrations:
           requires: [configure-infrastructure]
+      - deploy-backend
+          requires: [run-migrations]
+      - deploy-frontend
+          requires: [run-migrations]
+      
