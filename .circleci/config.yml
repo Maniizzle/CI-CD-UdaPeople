@@ -224,6 +224,7 @@ jobs:
       - run:
           name: Run migrations
           command: |
+            sudo apt-get update && sudo apt-get install -yy less
             apk add --update ansible python3 tar gzip aws-cli
             cd backend
             npm install
