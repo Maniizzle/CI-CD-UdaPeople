@@ -476,10 +476,10 @@ workflows:
           requires: 
             - build-backend
             - build-frontend
-          filters:
-            branches:
-              only:
-                - main
+          # filters:
+          #   branches:
+          #     only:
+          #       - main
       - configure-infrastructure:
           requires: [deploy-infrastructure]
       - run-migrations:
