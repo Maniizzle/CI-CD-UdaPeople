@@ -370,7 +370,7 @@ jobs:
             --query "Reservations[*].Instances[*].PublicIpAddress" \
             --filters "Name=tag:project,Values=udapeoplebe" \
             --output text)   # your code here
-            echo BACKEND_IP
+            echo ${BACKEND_IP}
             echo "http://${BACKEND_IP}:3030"
             if curl "http://${BACKEND_IP}/api/status" | grep "ok"
             then
