@@ -1,2 +1,2 @@
 URLO1= https://github.com/Maniizzle/CI-CD-UdaPeople
-URL02= http://udapeople-19951e3.s3-website-us-east-1.amazonaws.com/#/employees
+URL02= http://udapeople-176a617.s3-website-us-east-1.amazonaws.com/#/employees
